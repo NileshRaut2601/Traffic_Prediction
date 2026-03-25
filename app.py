@@ -1,69 +1,125 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import os
+import gdown
+
 from utils import classify_traffic_level, preprocess_input, get_days_in_month
 
-# Load model and features
-@st.cache_resource
-def load_model_and_features():
-    with open('model/traffic_model.pkl', 'rb') as f:
-        model = pickle.load(f)
-    with open('model/features.pkl', 'rb') as f:
-        features = pickle.load(f)
-    return model, features
+# -----------------------------
+# CONFIG
+# -----------------------------
+FILE_ID = "1nIcH_Fl6X_A5rato_r1qpuRzasPYjO-A"
+MODEL_PATH = "traffic_model.pkl"
 
+# -----------------------------
+# DOWNLOAD MODEL (if not exists)
+# -----------------------------
+@st.cache_resource
+def load_model():
+    if not os.path.exists(MODEL_PATH):
+        url = f"https://drive.google.com/uc?id={FILE_ID}"
+        gdown.download(url, MODEL_PATH, quiet=False)
+
+    with open(MODEL_PATH, "rb") as f:
+        model = pickle.load(f)
+
+    return model
+
+
+# -----------------------------
+# MAIN APP
+# -----------------------------
 def main():
-    st.title("Real-Time Traffic Prediction System")
-    st.markdown("Predict vehicle count and traffic congestion level using machine learning.")
-    
+    st.set_page_config(page_title="Traffic Prediction", page_icon="🚦")
+
+    st.title("🚦 Real-Time Traffic Prediction System")
+    st.markdown("Predict vehicle count and traffic congestion level using Machine Learning.")
+
     # Load model
     try:
-        model, features = load_model_and_features()
-    except FileNotFoundError:
-        st.error("Model files not found. Please run train.py first to train the model.")
+        model = load_model()
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
         return
-    
-    st.header("Input Parameters")
-    st.write("Set the date, time, and junction to predict traffic volume.")
 
-    junction = st.selectbox("Junction", options=[1, 2, 3, 4])
-    year = st.number_input("Year", min_value=2015, max_value=2025, value=2023, step=1)
-    month = st.selectbox("Month", options=list(range(1, 13)), format_func=lambda m: f"{m:02d}")
+    # -----------------------------
+    # INPUT SECTION
+    # -----------------------------
+    st.header("Input Parameters")
+
+    junction = st.selectbox("Junction", [1, 2, 3, 4])
+    year = st.number_input("Year", min_value=2015, max_value=2030, value=2023)
+
+    month = st.selectbox(
+        "Month",
+        list(range(1, 13)),
+        format_func=lambda m: f"{m:02d}"
+    )
 
     max_day = get_days_in_month(year, month)
-    day = st.selectbox("Day", options=list(range(1, max_day + 1)), format_func=lambda d: f"{d:02d}")
-    hour = st.selectbox("Time", options=list(range(24)), format_func=lambda h: f"{h:02d}:00")
+    day = st.selectbox(
+        "Day",
+        list(range(1, max_day + 1)),
+        format_func=lambda d: f"{d:02d}"
+    )
 
-    # Calculate week day automatically from year/month/day
+    hour = st.selectbox(
+        "Hour",
+        list(range(24)),
+        format_func=lambda h: f"{h:02d}:00"
+    )
+
+    # -----------------------------
+    # WEEKDAY AUTO CALCULATION
+    # -----------------------------
     try:
         date_obj = pd.to_datetime(f"{year}-{month:02d}-{day:02d}")
         weekday = date_obj.weekday()
         weekday_name = date_obj.day_name()
-        st.info(f"Weekday auto-calculated: {weekday_name} ({weekday})")
+
+        st.info(f"Weekday: {weekday_name} ({weekday})")
+
     except Exception as e:
-        st.error(f"Invalid date selected: {e}")
+        st.error(f"Invalid date: {e}")
         return
-    
+
+    # -----------------------------
+    # PREDICTION
+    # -----------------------------
     if st.button("Predict Traffic"):
+
         # Preprocess input
-        input_df = preprocess_input(junction, year, month, day, weekday, hour)
-        
+        input_df = preprocess_input(
+            junction, year, month, day, weekday, hour
+        )
+
         # Predict
         prediction = model.predict(input_df)[0]
-        predicted_vehicles = round(prediction)
-        traffic_level = classify_traffic_level(predicted_vehicles)
-        
+        vehicles = int(round(prediction))
+        level = classify_traffic_level(vehicles)
+
+        # -----------------------------
+        # OUTPUT
+        # -----------------------------
         st.header("Prediction Results")
-        st.metric("Predicted Vehicles", predicted_vehicles)
-        st.metric("Traffic Level", traffic_level)
-        
-        # Color coding
-        if traffic_level == 'Low':
-            st.success("Traffic is Low")
-        elif traffic_level == 'Medium':
+
+        col1, col2 = st.columns(2)
+
+        col1.metric("Vehicles", vehicles)
+        col2.metric("Traffic Level", level)
+
+        # Color feedback
+        if level == "Low":
+            st.success(" Traffic is Low")
+        elif level == "Medium":
             st.warning("Traffic is Medium")
         else:
             st.error("Traffic is High")
 
+
+# -----------------------------
+# RUN
+# -----------------------------
 if __name__ == "__main__":
     main()
