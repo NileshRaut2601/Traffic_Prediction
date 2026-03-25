@@ -32,7 +32,7 @@ def main():
 
     max_day = get_days_in_month(year, month)
     day = st.selectbox("Day", options=list(range(1, max_day + 1)), format_func=lambda d: f"{d:02d}")
-    hour = st.selectbox("Hour", options=list(range(24)), format_func=lambda h: f"{h:02d}:00")
+    hour = st.selectbox("Time", options=list(range(24)), format_func=lambda h: f"{h:02d}:00")
 
     # Calculate week day automatically from year/month/day
     try:
