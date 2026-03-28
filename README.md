@@ -145,6 +145,4 @@ This project demonstrates a complete end-to-end machine learning pipeline, inclu
 
 ---
 
-## 📄 License
 
-This project is licensed under the MIT License.
