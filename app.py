@@ -5,7 +5,7 @@ import os
 import gdown
 import matplotlib.pyplot as plt
 
-from utils import classify_traffic_level, preprocess_input, get_days_in_month
+from utils import classify_traffic_level, preprocess_input, get_days_in_month, convert_to_24_hour
 
 FILE_ID = "1nIcH_Fl6X_A5rato_r1qpuRzasPYjO"
 MODEL_PATH = "traffic_model.pkl"
@@ -40,7 +40,11 @@ def main():
     weekday = date_obj.weekday()
     st.info(f"{date_obj.day_name()}")
 
-    hour = st.slider("Hour", 0, 23)
+    col1, col2 = st.columns(2)
+    hour_12 = col1.selectbox("Hour", list(range(1, 13)))
+    period = col2.selectbox("AM/PM", ["AM", "PM"])
+
+    hour = convert_to_24_hour(hour_12, period)
 
     if st.button("Predict Traffic"):
         input_df = preprocess_input(junction, year, month, day, weekday, hour)
@@ -75,11 +79,17 @@ def main():
         ax.plot(df_plot["Hour"], df_plot["Vehicles"], marker='o', linewidth=2)
 
         ax.set_title("Hourly Traffic Prediction")
-        ax.set_xlabel("Hour")
+        ax.set_xlabel("Time")
         ax.set_ylabel("Vehicles")
 
         ax.grid(True, linestyle='--', alpha=0.6)
-        ax.set_xticks(range(24))
+
+        # AM/PM labels
+        ticks = list(range(0, 24, 2))
+        labels = [f"{(h%12 or 12)} {'AM' if h < 12 else 'PM'}" for h in ticks]
+
+        ax.set_xticks(ticks)
+        ax.set_xticklabels(labels, rotation=45)
 
         peak_hour = df_plot["Vehicles"].idxmax()
         peak_value = df_plot["Vehicles"].max()
@@ -89,7 +99,8 @@ def main():
 
         st.pyplot(fig)
 
-        st.success(f"Peak Traffic at {peak_hour}:00")
+        peak_label = f"{(peak_hour%12 or 12)} {'AM' if peak_hour < 12 else 'PM'}"
+        st.success(f"Peak Traffic at {peak_label}")
 
 
 if __name__ == "__main__":
