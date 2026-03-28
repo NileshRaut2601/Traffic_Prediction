@@ -1,110 +1,150 @@
-# Real-Time Traffic Prediction System
+# 🚦 Real-Time Traffic Prediction System
 
-A machine learning-powered web application that predicts vehicle count and traffic congestion levels in real-time using a trained Random Forest model.
+A machine learning-powered web application that predicts vehicle count and traffic congestion levels using a trained Random Forest model. The system provides both single-time predictions and full-day traffic trend visualization.
 
-## Features
+---
 
-- **Traffic Prediction**: Predict vehicle count based on junction, date, and time parameters
-- **Traffic Classification**: Automatic classification into Low, Medium, or High traffic levels
-- **Interactive Web Interface**: User-friendly Streamlit interface for easy input and visualization
-- **Model Training**: Complete training pipeline with data preprocessing and model evaluation
+## ✨ Features
 
-## Tech Stack
+* **Traffic Prediction**: Predict vehicle count based on junction, date, and time
+* **Traffic Classification**: Automatically classifies traffic as Low, Medium, or High
+* **12-Hour Input Support**: User-friendly AM/PM input (converted internally to 24-hour format)
+* **Daily Traffic Visualization**: Graph showing Hour vs Predicted Vehicles
+* **Peak Hour Detection**: Identifies busiest time of the day
+* **Interactive UI**: Built using Streamlit
+* **Cloud Deployment**: Hosted on Streamlit Cloud
 
-- **Python**: Core programming language
-- **Pandas & NumPy**: Data manipulation and numerical computing
-- **Scikit-learn**: Machine learning library for Random Forest model
-- **Streamlit**: Web framework for the user interface
-- **Pickle**: Model serialization
+---
 
-## Project Structure
+## 🛠 Tech Stack
+
+* **Python**
+* **Pandas, NumPy**
+* **Scikit-learn (Random Forest)**
+* **Streamlit**
+* **Matplotlib**
+* **gdown (for model loading)**
+
+---
+
+## 📁 Project Structure
 
 ```
 traffic_project/
 │
-├── app.py                # Streamlit web application
-├── train.py              # Model training script
+├── app.py                # Streamlit app
+├── train.py              # Model training
 ├── utils.py              # Helper functions
-├── requirements.txt      # Python dependencies
-├── README.md            # Project documentation
-├── .gitignore           # Git ignore rules
+├── requirements.txt
+├── README.md
+├── .gitignore
 │
 ├── data/
-│   └── traffic.csv      # Traffic dataset
+│   └── traffic.csv
 │
-└── model/
-    ├── traffic_model.pkl # Trained Random Forest model
-    └── features.pkl      # Feature list for consistency
+└── model/ (ignored in Git)
+    └── traffic_model.pkl
 ```
 
-## Installation
+---
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd traffic_project
-   ```
+## ⚙️ Installation
 
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+```bash
+git clone <repository-url>
+cd traffic_project
+python -m venv venv
+venv\Scripts\activate   # Windows
+pip install -r requirements.txt
+```
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-## How to Train the Model
+## 🧠 Model Training
 
-1. Ensure the dataset `data/traffic.csv` is present
-2. Run the training script:
-   ```bash
-   python train.py
-   ```
-3. The script will:
-   - Load and preprocess the data
-   - Train a Random Forest model
-   - Display the R² score
-   - Save the model and features to the `model/` directory
+```bash
+python train.py
+```
 
-## How to Run the Streamlit App
+* Preprocesses data
+* Trains Random Forest model
+* Saves model locally
 
-1. Ensure the model is trained (run `train.py` first)
-2. Start the Streamlit application:
-   ```bash
-   streamlit run app.py
-   ```
-3. Open your browser to the provided URL (usually http://localhost:8501)
-4. Enter the prediction parameters and click "Predict Traffic"
+---
 
-## Usage
+## 🚀 Run the App (Local)
 
-1. **Junction**: Select the junction number (1-4)
-2. **Date/Time Parameters**:
-   - Year: Select the year
-   - Month: Select the month (1-12)
-   - Day: Select the day (1-31)
-   - Weekday: Select the day of the week
-   - Hour: Select the hour (0-23)
-3. Click "Predict Traffic" to get the prediction
-4. View the predicted vehicle count and traffic level
+```bash
+streamlit run app.py
+```
 
-## Traffic Classification
+---
 
-- **Low**: Less than 20 vehicles
-- **Medium**: 20-50 vehicles
-- **High**: More than 50 vehicles
+## 🌐 Live Deployment
 
-## Contributing
+The app is deployed on Streamlit Cloud.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+👉 **Live App**: *(add your link here)*
 
-## License
+---
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 📊 Usage
+
+### Inputs:
+
+* Junction (1–4)
+* Year, Month, Day
+* Hour (12-hour format with AM/PM)
+
+### Outputs:
+
+* Predicted Vehicles
+* Traffic Level
+* Full-day traffic graph
+* Peak traffic hour
+
+---
+
+## 📈 Traffic Levels
+
+| Vehicles | Level  |
+| -------- | ------ |
+| < 20     | Low    |
+| 20–50    | Medium |
+| > 50     | High   |
+
+---
+
+## 🔄 How It Works
+
+```text
+User Input → Convert (12hr → 24hr) → Model → Prediction → Visualization
+```
+
+---
+
+## ⚠️ Note on Model File
+
+* The trained model is **not stored in GitHub** (due to size limits)
+* It is downloaded dynamically using Google Drive
+
+---
+
+## 🚀 Future Improvements
+
+* Live traffic API integration
+* Google Maps visualization
+* Deep Learning (LSTM) model
+* Multi-day comparison dashboard
+
+---
+
+## 🎓 Conclusion
+
+This project demonstrates a complete end-to-end machine learning pipeline, including data preprocessing, model training, deployment, and interactive visualization using Streamlit.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
