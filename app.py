@@ -13,8 +13,11 @@ MODEL_PATH = "traffic_model.pkl"
 
 @st.cache_resource
 def load_model():
+
     if not os.path.exists(MODEL_PATH):
-        url = f"https://drive.google.com/uc?id={FILE_ID}"
+
+        url = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
+
         gdown.download(url, MODEL_PATH, quiet=False)
 
     with open(MODEL_PATH, "rb") as f:
