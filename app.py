@@ -2,27 +2,31 @@ import streamlit as st
 import pickle
 import pandas as pd
 import os
-import gdown
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+from huggingface_hub import hf_hub_download
 from utils import classify_traffic_level, preprocess_input, get_days_in_month, convert_to_24_hour
 
-FILE_ID = "1nIcH_Fl6X_A5rato_r1qpuRzasPYjO"
-MODEL_PATH = "traffic_model.pkl"
+MODEL_PATH = hf_hub_download(
+    repo_id="nilesh26-01/traffic-prediction-model",
+    filename="traffic_model.pkl"
+)
+
+
+from huggingface_hub import hf_hub_download
+import pickle
 
 
 @st.cache_resource
 def load_model():
 
-    if not os.path.exists(MODEL_PATH):
+    model_path = hf_hub_download(
+        repo_id="nilesh26-01/traffic-prediction-model",
+        filename="traffic_model.pkl"
+    )
 
-        url = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
-
-        gdown.download(url, MODEL_PATH, quiet=False)
-
-    with open(MODEL_PATH, "rb") as f:
+    with open(model_path, "rb") as f:
         return pickle.load(f)
-
 
 def main():
     st.set_page_config(page_title="Traffic Prediction", page_icon="🚦")
